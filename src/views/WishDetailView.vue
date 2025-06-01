@@ -52,7 +52,7 @@ onMounted(() => {
         </div>
         <div class="progress-item">
           <h3>未来计划</h3>
-          <p>{{ wish.progress.future }}</p>
+          <p>{{ wish.progress.next }}</p>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { Wish } from '../types/wish'
+import type { Wish } from '../types/wish'
 
 /**
  * Pinia Store 的状态接口定义
@@ -17,28 +17,163 @@ export const useWishStore = defineStore('wish', {
   /**
    * Store 的状态定义
    * 包含初始的示例愿望数据
-   */
-  state: (): WishState => ({
+   */  state: (): WishState => ({
     wishes: [
       {
         id: 1,
-        title: '创建记录愿望实现过程的网站',
-        description: '开发一个网站用于记录和追踪100个愿望的实现过程',
-        status: 'completed',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        title: "创建记录愿望实现过程的网站",
+        description: "去南极看看企鹅和极光",
+        status: "in-progress",
+        progress: {
+          current: "正在搭建网站框架",
+          next: "添加数据库sqlite"
+        },
+        createdAt: new Date().toLocaleString(),
+        updatedAt: new Date().toLocaleString()
       },
       {
         id: 2,
-        title: '开发网页版电子琴',
-        description: '实现一个网页版的电子琴应用',
-        status: 'in-progress',
+        title: "开发网页版电子琴",
+        description: "",
+        status: "in-progress",
         progress: {
-          current: '已实现三个八度的钢琴键，支持鼠标点击弹奏',
-          future: '加入电脑键盘显示功能，按键以彩虹颜色显示'
+          current: "已实现三个八度的钢琴键，支持鼠标点击弹奏",
+          next: "加入电脑键盘显示功能，按键以彩虹颜色显示"
         },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: new Date().toLocaleString(),
+        updatedAt: new Date().toLocaleString()
+      },
+      {
+        id: 3,
+        title: "编写安卓版电子琴应用",
+        description: "",
+        status: "pending",
+        progress: {
+          current: "",
+          next: ""
+        },
+        createdAt: new Date().toLocaleString(),
+        updatedAt: new Date().toLocaleString()
+      },
+      {
+        id: 4,
+        title: "开发网页版国际象棋游戏",
+        description: "",
+        status: "pending",
+        progress: {
+          current: "",
+          next: ""
+        },
+        createdAt: new Date().toLocaleString(),
+        updatedAt: new Date().toLocaleString()
+      },
+      {
+        id: 5,
+        title: "编写MQTT服务器管理应用",
+        description: "",
+        status: "pending",
+        progress: {
+          current: "",
+          next: ""
+        },
+        createdAt: new Date().toLocaleString(),
+        updatedAt: new Date().toLocaleString()
+      },
+      {
+        id: 6,
+        title: "研究AI编程在工作中的实际应用",
+        description: "提高工作效率，防止公司资产泄露",
+        status: "pending",
+        progress: {
+          current: "",
+          next: ""
+        },
+        createdAt: new Date().toLocaleString(),
+        updatedAt: new Date().toLocaleString()
+      },
+      {
+        id: 7,
+        title: "利用Nodejs实现J2EE的经典宠物店应用",
+        description: "",
+        status: "pending",
+        progress: {
+          current: "",
+          next: ""
+        },
+        createdAt: new Date().toLocaleString(),
+        updatedAt: new Date().toLocaleString()
+      },
+      {
+        id: 8,
+        title: "实现WMS系统",
+        description: "采用富乐的标准数据库",
+        status: "pending",
+        progress: {
+          current: "",
+          next: ""
+        },
+        createdAt: new Date().toLocaleString(),
+        updatedAt: new Date().toLocaleString()
+      },
+      {
+        id: 9,
+        title: "开发网上订餐系统",
+        description: "2003年大学时期的创意",
+        status: "pending",
+        progress: {
+          current: "",
+          next: ""
+        },
+        createdAt: new Date().toLocaleString(),
+        updatedAt: new Date().toLocaleString()
+      },
+      {
+        id: 10,
+        title: "开发温湿度监测系统",
+        description: "结合ESP32和温湿度传感器",
+        status: "pending",
+        progress: {
+          current: "",
+          next: ""
+        },
+        createdAt: new Date().toLocaleString(),
+        updatedAt: new Date().toLocaleString()
+      },
+      {
+        id: 11,
+        title: "在网页电子琴基础上实现编码功能",
+        description: "将简谱转换成特定编码，实现自动弹奏",
+        status: "pending",
+        progress: {
+          current: "",
+          next: ""
+        },
+        createdAt: new Date().toLocaleString(),
+        updatedAt: new Date().toLocaleString()
+      },
+      {
+        id: 12,
+        title: "实现一个听歌转换成简谱的工具",
+        description: "先转换成简谱，再转换成编码，实现自动弹奏。",
+        status: "pending",
+        progress: {
+          current: "",
+          next: ""
+        },
+        createdAt: new Date().toLocaleString(),
+        updatedAt: new Date().toLocaleString()
+      },
+      {
+        id: 13,
+        title: "再次研究三十年前小霸王学习机手册中的音乐编曲",
+        description: "",
+        status: "pending",
+        progress: {
+          current: "",
+          next: ""
+        },
+        createdAt: new Date().toLocaleString(),
+        updatedAt: new Date().toLocaleString()
       }
     ]
   }),
@@ -52,11 +187,12 @@ export const useWishStore = defineStore('wish', {
      * @param wish - 新愿望的数据（不包含 id 和时间戳）
      */
     addWish(wish: Omit<Wish, 'id' | 'createdAt' | 'updatedAt'>) {
+      const now = new Date().toLocaleString();
       const newWish: Wish = {
         ...wish,
-        id: this.wishes.length + 1,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        id: Math.max(0, ...this.wishes.map(w => w.id)) + 1,
+        createdAt: now,
+        updatedAt: now
       }
       this.wishes.push(newWish)
     },
@@ -72,7 +208,7 @@ export const useWishStore = defineStore('wish', {
         this.wishes[index] = {
           ...this.wishes[index],
           ...updates,
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toLocaleString() // 更新最后修改时间
         }
       }
     },

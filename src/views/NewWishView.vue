@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWishStore } from '../stores/wishStore'
-import type { Wish } from '../types/wish'
+//import type { Wish } from '../types/wish'
 
 const router = useRouter()
 const wishStore = useWishStore()
@@ -25,6 +25,8 @@ const submitForm = () => {
           },
         }
       : {}),
+      createdAt: new Date().toLocaleString(),
+      updatedAt: new Date().toLocaleString(),
   }
 
   wishStore.addWish(newWish)

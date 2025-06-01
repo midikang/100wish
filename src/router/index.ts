@@ -45,7 +45,7 @@ const router = createRouter({
  * 在每次路由切换前执行
  * 用于动态设置页面标题
  */
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _, next) => {
   document.title = `${to.meta.title} - 我的100个愿望计划`
   next()
 })

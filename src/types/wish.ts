@@ -13,16 +13,16 @@ export interface Wish {
    * in-progress - 进行中
    * completed - 已完成
    */
-  status: 'pending' | 'in-progress' | 'completed';
+  status: string//;'pending' | 'in-progress' | 'completed';
   /** 愿望的进展情况（可选） */
   progress?: {
     /** 当前已完成的进度 */
     current: string;
-    /** 未来的计划 */
-    future: string;
+    /** 下一步计划 */
+    next?: string;
   };
-  /** 愿望创建的时间（ISO 格式的字符串） */
-  createdAt: string;
-  /** 愿望最后更新的时间（ISO 格式的字符串） */
-  updatedAt: string;
+  /** 创建时间 */
+  createdAt: Date | string;
+  /** 最后更新时间 */
+  updatedAt: Date | string;
 }

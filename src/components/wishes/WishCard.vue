@@ -17,79 +17,99 @@ const statusText = computed(() => {
   }
 })
 
-const statusClass = computed(() => {
-  return {
-    'bg-gray-100': props.wish.status === 'pending',
-    'bg-blue-100': props.wish.status === 'in-progress',
-    'bg-green-100': props.wish.status === 'completed'
-  }
-})
+const statusClass = computed(() => ({
+  'status-pending': props.wish.status === 'pending',
+  'status-progress': props.wish.status === 'in-progress',
+  'status-completed': props.wish.status === 'completed'
+}))
 </script>
 
 <template>
-  <div class="wish-card hover:shadow-lg transition-shadow duration-300">
-    <div class="card-header">
-      <h3 class="text-xl font-bold mb-2">{{ wish.title }}</h3>
-      <span :class="['status-badge', statusClass]">{{ statusText }}</span>
-    </div>
-    
-    <p class="text-gray-600 mb-4">{{ wish.description }}</p>
-    
-    <div v-if="wish.progress" class="progress-section">
-      <div class="current-progress">
-        <h4 class="text-sm font-semibold text-gray-700">当前进展</h4>
-        <p class="text-sm text-gray-600">{{ wish.progress.current }}</p>
+  <div class="wish-card">
+    <div class="wish-content">
+      <h3 class="wish-title">{{ wish.title }}</h3>
+      <p class="wish-description">{{ wish.description }}</p>
+      <div class="wish-progress" v-if="wish.progress">
+        <p class="current">当前: {{ wish.progress.current }}</p>
+        <p class="next" v-if="wish.progress.next">下一步: {{ wish.progress.next }}</p>
       </div>
-      <div class="future-plans">
-        <h4 class="text-sm font-semibold text-gray-700">未来计划</h4>
-        <p class="text-sm text-gray-600">{{ wish.progress.future }}</p>
+      <div :class="['wish-status', statusClass]">
+        {{ statusText }}
       </div>
-    </div>
-
-    <div class="card-footer">
-      <span class="text-xs text-gray-500">
-        创建于 {{ new Date(wish.createdAt).toLocaleDateString() }}
-      </span>
     </div>
   </div>
 </template>
 
-<style>
+<style scoped>
 .wish-card {
-  background-color: white;
+  background: white;
   border-radius: var(--radius-lg);
-  padding: var(--spacing-4);
-  border: 1px solid var(--color-gray-200);
-  transition: box-shadow 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .wish-card:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--spacing-4);
+.wish-content {
+  padding: 1.5rem;
 }
 
-.status-badge {
+.wish-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-gray-900);
+  margin-bottom: 0.75rem;
+}
+
+.wish-description {
+  color: var(--color-gray-700);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.wish-progress {
+  font-size: 0.875rem;
+  color: var(--color-gray-700);
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: var(--color-gray-50);
+  border-radius: var(--radius-md);
+}
+
+.wish-progress .current {
+  margin-bottom: 0.5rem;
+}
+
+.wish-progress .next {
+  color: var(--color-primary);
+}
+
+.wish-status {
+  display: inline-block;
   padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-full, 9999px);
   font-size: 0.875rem;
   font-weight: 500;
 }
 
-.progress-section {
-  margin-top: var(--spacing-4);
-  padding-top: var(--spacing-4);
-  border-top: 1px solid var(--color-gray-100);
+.status-pending {
+  background-color: var(--color-warning);
+  color: white;
 }
 
-.card-footer {
-  margin-top: var(--spacing-4);
-  padding-top: var(--spacing-4);
-  border-top: 1px solid var(--color-gray-100);
+.status-progress {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.status-completed {
+  background-color: var(--color-success);
+  color: white;
 }
 </style>
