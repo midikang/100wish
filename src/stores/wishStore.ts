@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import type { Wish } from '../types/wish'
-import { wishDb } from '../db';
+import { db, initializeDatabase } from '../db/database'
 
 /**
  * Pinia Store 的状态接口定义
@@ -23,9 +23,9 @@ export const useWishStore = defineStore('wish', {
    * Store 的状态定义
    */
   state: (): WishState => ({
-    wishes: [],
+    wishes: [] as Wish[],
     loading: false,
-    error: null
+    error: null as string | null
   }),
 
   /**
@@ -60,17 +60,8 @@ export const useWishStore = defineStore('wish', {
       this.error = null;
       
       try {
-        const wishes = await wishDb.getAllWishes();
-        this.wishes = wishes.map(wish => {
-          const progress = wish.progress? {
-            current: wish.progress.current || '',
-            next: wish.progress.next || ''
-          } : { current: '', next: '' };
-          return {
-            ...wish,
-            progress
-          };
-        });
+        await initializeDatabase()
+        this.wishes = await db.wishes.toArray()
       } catch (error: any) {
         this.error = error.message || '加载愿望失败';
         console.error('加载愿望失败:', error);
@@ -83,28 +74,18 @@ export const useWishStore = defineStore('wish', {
      * 添加新的愿望
      * @param wish - 新愿望的数据
      */
-    async addWish(wish: Omit<Wish, 'id' | 'createdAt' | 'updatedAt'>) {
+    async addWish(wish: Omit<Wish, 'id' >) {
       this.loading = true;
       this.error = null;
       
       try {
-        const newWish = await wishDb.addWish({
+        const id = await db.wishes.add({
           ...wish,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
-        });
-
-        const progress = newWish.progress? {
-          current: newWish.progress.current || '',
-          next: newWish.progress.next || ''
-        } : { current: '', next: '' };
-        
-        this.wishes.push({
-          ...newWish,
-          progress
-        });
-        
-        return newWish;
+        })
+        await this.loadWishes()
+        return id
       } catch (error: any) {
         this.error = error.message || '添加愿望失败';
         console.error('添加愿望失败:', error);
@@ -124,34 +105,11 @@ export const useWishStore = defineStore('wish', {
       this.error = null;
       
       try {
-        // 处理 progress 对象
-        const formattedUpdates = { ...updates };
-        if (updates.progress) {
-          formattedUpdates.progress = {
-            current: updates.progress.current || '',
-            next: updates.progress.next || ''
-          };
-          delete formattedUpdates.progress;
-        }
-        
-        const updatedWish = await wishDb.updateWish(id, formattedUpdates);
-        
-        if (updatedWish) {
-          const index = this.wishes.findIndex(w => w.id === id);
-          if (index > -1) {
-            const progress = updatedWish.progress? {
-              current: updatedWish.progress.current || '',
-              next: updatedWish.progress.next || ''
-            } : { current: '', next: '' };
-
-            this.wishes[index] = {
-              ...updatedWish,
-              progress
-            };
-          }
-        }
-        
-        return updatedWish;
+        await db.wishes.update(id, {
+          ...updates,
+          updatedAt: new Date().toISOString()
+        })
+        await this.loadWishes()
       } catch (error: any) {
         this.error = error.message || '更新愿望失败';
         console.error('更新愿望失败:', error);
@@ -170,9 +128,12 @@ export const useWishStore = defineStore('wish', {
       this.error = null;
       
       try {
-        await wishDb.deleteWish(id);
-        this.wishes = this.wishes.filter(wish => wish.id !== id);
-        return true;
+        
+
+        await db.deleteWish(id);
+        // todo 待完善，是否要刷新列表？
+        // this.wishes = this.wishes.filter(wish => wish.id !== id);
+        // return true;
       } catch (error: any) {
         this.error = error.message || '删除愿望失败';
         console.error('删除愿望失败:', error);

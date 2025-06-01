@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import type { Wish } from '../types/wish'
-import { wishDb } from '../db';
+import { wishDb } from '../db/database';
 
 
 /**
