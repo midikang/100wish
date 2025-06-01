@@ -6,6 +6,12 @@ import { computed, ref } from 'vue'
 // 获取愿望清单的 store 实例
 const wishStore = useWishStore()
 const selectedStatus = ref('全部')
+const loading = ref(true)
+
+// 立即加载愿望列表
+wishStore.loadWishes().finally(() => {
+  loading.value = false
+})
 
 // 获取愿望列表
 const wishes = computed(() => wishStore.wishes)
@@ -29,7 +35,7 @@ const filteredWishes = computed(() => {
     <header class="page-header">
       <h1>我的愿望清单</h1>
       <button
-        @click="$router.push('/wish/new')"
+        @click="$router.push('/new')"
         class="new-wish-btn"
       >
         创建新愿望
@@ -53,14 +59,12 @@ const filteredWishes = computed(() => {
         :key="wish.id"
         :wish="wish"
         @click="$router.push(`/wish/${wish.id}`)"
-        class="cursor-pointer hover:transform hover:scale-105 transition-transform"
+        class="wish-card-item"
       />
     </div>
 
     <div v-if="wishes.length === 0" class="empty-state">
-      <p class="text-gray-500 text-center">
-        还没有添加任何愿望，点击右上角的"新建愿望"开始吧！
-      </p>
+      <p>还没有添加任何愿望，点击右上角的"新建愿望"开始吧！</p>
     </div>
   </div>
 </template>
@@ -107,8 +111,8 @@ const filteredWishes = computed(() => {
 .filter-btn {
   padding: 0.5rem 1rem;
   border-radius: var(--radius-md);
-  background-color: var(--color-bg-secondary);
-  color: var(--color-text);
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-700);
   transition: all 0.3s;
 }
 
@@ -121,6 +125,21 @@ const filteredWishes = computed(() => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 2rem;
+}
+
+.wish-card-item {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.wish-card-item:hover {
+  transform: scale(1.05);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-gray-500);
 }
 
 @media (max-width: 640px) {

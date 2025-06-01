@@ -13,10 +13,19 @@ import AppNav from './components/layout/AppNav.vue'
 
 <style>
 .app {
-  @apply min-h-screen bg-gray-50;
+  min-height: 100vh;
+  background-color: var(--color-gray-50);
 }
 
 .main-content {
-  @apply container mx-auto px-4 py-6 sm:px-6 lg:px-8;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .main-content {
+    padding: 2rem;
+  }
 }
 </style>

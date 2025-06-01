@@ -12,7 +12,7 @@ const navigateToNewWish = () => {
   <nav class="app-nav">
     <div class="nav-content">
       <router-link to="/" class="nav-brand">
-        <h1 class="text-xl font-bold">我的100个愿望</h1>
+        <h1>我的100个愿望</h1>
       </router-link>
 
       <div class="nav-actions">
@@ -27,51 +27,59 @@ const navigateToNewWish = () => {
   </nav>
 </template>
 
-<style>
+<style scoped>
 .app-nav {
   background-color: white;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 100;
 }
 
 .nav-content {
-  max-width: 80rem;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
-  height: 4rem;
+  padding: 1rem;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 }
 
 .nav-brand {
-  color: #111827;
-  transition: color 0.2s;
+  text-decoration: none;
+  color: var(--color-primary);
 }
 
-.nav-brand:hover {
-  color: #374151;
+.nav-brand h1 {
+  font-size: 1.25rem;
+  font-weight: bold;
 }
 
 .new-wish-btn {
-  background-color: #2563eb;
+  background-color: var(--color-primary);
   color: white;
   padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-md);
   font-weight: 500;
-  transition: background-color 0.2s;
+  transition: background-color 0.3s;
 }
 
 .new-wish-btn:hover {
-  background-color: #1d4ed8;
+  background-color: var(--color-primary-dark);
 }
 
-.new-wish-btn:focus {
-  outline: none;
-  ring: 2px;
-  ring-offset: 2px;
-  ring-color: #3b82f6;
+@media (max-width: 640px) {
+  .nav-content {
+    padding: 0.75rem;
+  }
+  
+  .nav-brand h1 {
+    font-size: 1rem;
+  }
+  
+  .new-wish-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+  }
 }
 </style>

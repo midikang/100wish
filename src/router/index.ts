@@ -1,4 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import HomeView from '../views/HomeView.vue'
+import WishDetailView from '../views/WishDetailView.vue'
+import NewWishView from '../views/NewWishView.vue'
 
 /**
  * 路由配置数组
@@ -8,7 +11,7 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('../views/HomeView.vue'), // 使用动态导入实现路由懒加载
+    component: HomeView,
     meta: { 
       title: '我的100个愿望' // 用于设置页面标题
     }
@@ -16,7 +19,7 @@ const routes = [
   {
     path: '/wish/:id', // 动态路由参数，用于展示特定愿望的详情
     name: 'WishDetail',
-    component: () => import('../views/WishDetailView.vue'),
+    component: WishDetailView,
     meta: { 
       title: '愿望详情'
     }
@@ -24,7 +27,7 @@ const routes = [
   {
     path: '/new',
     name: 'NewWish',
-    component: () => import('../views/NewWishView.vue'),
+    component: NewWishView,
     meta: { 
       title: '新建愿望'
     }

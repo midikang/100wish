@@ -2,10 +2,11 @@
   "name": "100wishplan",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://midikang.github.io/100wish/",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc -b && vite build",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {

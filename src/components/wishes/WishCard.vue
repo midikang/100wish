@@ -27,7 +27,7 @@ const statusClass = computed(() => ({
 <template>
   <div class="wish-card">
     <div class="wish-content">
-      <h3 class="wish-title">{{ wish.title }}</h3>
+      <h3 class="wish-title">{{ wish.id }} - {{ wish.title }}</h3>
       <p class="wish-description">{{ wish.description }}</p>
       <div class="wish-progress" v-if="wish.progress">
         <p class="current">当前: {{ wish.progress.current }}</p>
@@ -60,6 +60,7 @@ const statusClass = computed(() => ({
   padding: 1.5rem;
 }
 
+.wish-id
 .wish-title {
   font-size: 1.25rem;
   font-weight: 600;
