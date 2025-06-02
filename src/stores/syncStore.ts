@@ -11,8 +11,7 @@ export const useSyncStore = defineStore('sync', {
     syncError: null as string | null
   }),
 
-  actions: {
-    async syncWishes() {
+  actions: {    async syncWishes() {
       const wishStore = useWishStore()
       const online = useOnline()
 
@@ -21,25 +20,45 @@ export const useSyncStore = defineStore('sync', {
         return
       }
 
+      if (this.syncing) {
+        console.log('同步已在进行中')
+        return
+      }
+
       this.syncing = true
       this.syncError = null
 
       try {
-        // 获取本地数据
-        const localWishes = wishStore.wishes
+        // 1. 获取并缓存本地数据
+        const localWishes = [...wishStore.wishes]  // 创建副本
 
-        // 执行同步
+        // 2. 尝试同步
         const syncedWishes = await wishApi.syncWishes(localWishes)
 
-        // 更新本地数据
+        // 3. 验证同步数据的完整性
+        const localIds = new Set(localWishes.map(w => w.id))
+        const syncedIds = new Set(syncedWishes.map(w => w.id))
+        
+        // 确保没有数据丢失
+        if (localIds.size > syncedIds.size) {
+          throw new Error('同步后数据不完整，请重试')
+        }
+
+        // 4. 更新本地数据
         await wishStore.replaceAllWishes(syncedWishes)
 
+        // 5. 同步成功，更新状态
         this.lastSyncTime = new Date()
         this.pendingChanges = []
+        console.log('同步成功，当前愿望数量:', syncedWishes.length)
 
       } catch (error) {
         console.error('同步失败:', error)
-        this.syncError = '同步失败，请稍后重试'
+        this.syncError = error instanceof Error ? error.message : '同步失败，请稍后重试'
+        
+        // 同步失败后的恢复操作
+        await wishStore.loadWishes()  // 重新加载本地数据
+        
       } finally {
         this.syncing = false
       }

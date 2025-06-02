@@ -57,21 +57,46 @@ router.delete('/:id', asyncHandler(async (req, res) => {
 // 同步愿望数据
 router.post('/sync', asyncHandler(async (req, res) => {
   const clientWishes = req.body;
+  const clientWishIds = new Set(clientWishes.map(w => w.id));
   
-  for (const clientWish of clientWishes) {
-    const [wish, created] = await Wish.findOrCreate({
-      where: { id: clientWish.id },
-      defaults: clientWish
+  try {
+    // 1. 获取所有服务器端的愿望
+    const serverWishes = await Wish.findAll();
+    const serverWishIds = new Set(serverWishes.map(w => w.id));
+    
+    // 2. 处理客户端的数据
+    for (const clientWish of clientWishes) {
+      const serverWish = serverWishes.find(w => w.id === clientWish.id);
+      
+      if (!serverWish) {
+        // 服务器端不存在，创建新记录
+        await Wish.create(clientWish);
+      } else if (new Date(clientWish.updatedAt) > serverWish.updatedAt) {
+        // 客户端版本更新，更新服务器数据
+        await serverWish.update(clientWish);
+      }
+    }
+    
+    // 3. 确保客户端有所有服务器端的数据
+    for (const serverWish of serverWishes) {
+      if (!clientWishIds.has(serverWish.id)) {
+        // 客户端缺少此记录，需要在响应中包含
+        clientWishes.push(serverWish.toJSON());
+      }
+    }
+    
+    // 4. 返回完整的同步后数据
+    const finalWishes = await Wish.findAll({
+      order: [['updatedAt', 'DESC']]
     });
     
-    if (!created && new Date(clientWish.updatedAt) > wish.updatedAt) {
-      await wish.update(clientWish);
-    }
+    res.json(finalWishes);
+    
+  } catch (error) {
+    console.error('同步失败:', error);
+    res.status(500).json({
+      message: '同步失败，请重试',
+      error: error.message
+    });
   }
-  
-  const updatedWishes = await Wish.findAll({
-    order: [['updatedAt', 'DESC']]
-  });
-  
-  res.json(updatedWishes);
 }));

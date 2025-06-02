@@ -23,7 +23,8 @@
 }
 
 /* Google theme styles */
-.theme-google {  color-scheme: light;
+.theme-google {  
+  color-scheme: light;
   --bg-primary: var(--google-background);
   --bg-pattern: var(--google-pattern);
   --text-primary: #202124;
@@ -31,7 +32,11 @@
   --surface-1: rgba(255, 255, 255, 0.8);
   --surface-2: rgba(255, 255, 255, 0.9);
   --border-color: rgba(32, 33, 36, 0.12);
+  --primary: var(--google-primary);
+  --secondary: var(--google-secondary);
+  --accent: var(--google-accent);
   --highlight: var(--google-primary);
+  --warning: #fbbc05;
   --shadow: 0 4px 20px rgba(66, 133, 244, 0.1);
 }
 
@@ -45,7 +50,11 @@
   --surface-1: rgba(255, 255, 255, 0.8);
   --surface-2: rgba(255, 255, 255, 0.9);
   --border-color: rgba(0, 120, 212, 0.12);
+  --primary: var(--microsoft-primary);
+  --secondary: var(--microsoft-secondary);
+  --accent: var(--microsoft-accent);
   --highlight: var(--microsoft-primary);
+  --warning: #ffaa44;
   --shadow: 0 4px 20px rgba(0, 120, 212, 0.08);
 }
 
@@ -59,7 +68,11 @@
   --surface-1: rgba(255, 255, 255, 0.7);
   --surface-2: rgba(255, 255, 255, 0.85);
   --border-color: rgba(233, 84, 32, 0.12);
+  --primary: var(--ubuntu-primary);
+  --secondary: var(--ubuntu-secondary);
+  --accent: var(--ubuntu-accent);
   --highlight: var(--ubuntu-primary);
+  --warning: #f99b11;
   --shadow: 0 6px 24px rgba(233, 84, 32, 0.1);
 }
 
