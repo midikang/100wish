@@ -7,11 +7,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node server/index.js",
+    "deploy": "npm run build && pm2 start ecosystem.config.js"
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
     "@vueuse/core": "^13.3.0",
+    "axios": "^1.9.0",
     "dexie": "^4.0.11",
     "pinia": "^3.0.2",
     "vue": "^3.5.13",

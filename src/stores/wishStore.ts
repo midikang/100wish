@@ -232,6 +232,25 @@ export const useWishStore = defineStore('wish', {
         console.error('更新进度失败:', error)
         throw error
       }
+    },
+
+    /**
+     * 替换所有愿望数据（用于同步）
+     */
+    async replaceAllWishes(wishes: Wish[]) {
+      // 清空现有数据
+      await db.wishes.clear()
+      // 批量添加新数据
+      await db.wishes.bulkAdd(wishes)
+      // 重新加载数据
+      await this.loadWishes()
+    },
+
+    /**
+     * 生成更改记录ID
+     */
+    generateChangeId(action: string, wishId: number) {
+      return `${action}_${wishId}_${Date.now()}`
     }
   }
 })

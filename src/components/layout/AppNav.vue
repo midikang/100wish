@@ -1,10 +1,22 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { useSyncStore } from '../../stores/syncStore'
+import { useOnline } from '@vueuse/core'
 
 const router = useRouter()
+const syncStore = useSyncStore()
+const online = useOnline()
 
 const navigateToNewWish = () => {
   router.push('/new')
+}
+
+const sync = async () => {
+  if (!online.value) {
+    alert('当前处于离线状态，请检查网络连接')
+    return
+  }
+  await syncStore.syncWishes()
 }
 </script>
 
@@ -16,6 +28,17 @@ const navigateToNewWish = () => {
       </router-link>
 
       <div class="nav-actions">
+        <span class="sync-status" :class="{ offline: !online }">
+          {{ online ? syncStore.syncStatus : '离线模式' }}
+        </span>
+        <button
+          v-if="syncStore.hasPendingChanges && online"
+          @click="sync"
+          class="sync-btn"
+          :disabled="syncStore.syncing"
+        >
+          {{ syncStore.syncing ? '同步中...' : '同步' }}
+        </button>
         <button
           @click="navigateToNewWish"
           class="new-wish-btn"
@@ -66,6 +89,31 @@ const navigateToNewWish = () => {
 
 .new-wish-btn:hover {
   background-color: var(--color-primary-dark);
+}
+
+.sync-status {
+  font-size: 0.875rem;
+  color: var(--color-gray-600);
+  margin-right: 1rem;
+}
+
+.sync-status.offline {
+  color: var(--color-warning);
+}
+
+.sync-btn {
+  margin-right: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--color-success);
+  color: white;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  transition: opacity 0.2s;
+}
+
+.sync-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 @media (max-width: 640px) {

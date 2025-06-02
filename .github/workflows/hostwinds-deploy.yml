@@ -1,0 +1,35 @@
+# 部署到 Hostwinds 的配置和脚本
+name: Deploy to Hostwinds
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          
+      - name: Install Dependencies
+        run: npm install
+        
+      - name: Build
+        run: npm run build
+        env:
+          VITE_API_BASE_URL: ${{ secrets.HOSTWINDS_API_URL }}
+        
+      - name: Deploy to Hostwinds
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.HOSTWINDS_FTP_SERVER }}
+          username: ${{ secrets.HOSTWINDS_FTP_USERNAME }}
+          password: ${{ secrets.HOSTWINDS_FTP_PASSWORD }}
+          local-dir: dist/
+          server-dir: /public_html/
