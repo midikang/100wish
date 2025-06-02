@@ -1,0 +1,95 @@
+/* Theme variables */
+:root {
+  /* Google theme */
+  --google-primary: #4285f4;
+  --google-secondary: #34a853;
+  --google-accent: #fbbc05;
+  --google-background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.92));
+  --google-pattern: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%234285f4' stroke-width='2' stroke-opacity='0.1'%3E%3Ccircle cx='25' cy='25' r='12'/%3E%3Ccircle cx='75' cy='75' r='12' stroke='%23ea4335'/%3E%3Ccircle cx='75' cy='25' r='12' stroke='%23fbbc05'/%3E%3Ccircle cx='25' cy='75' r='12' stroke='%2334a853'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+
+  /* Microsoft theme */
+  --microsoft-primary: #0078d4;
+  --microsoft-secondary: #50e6ff;
+  --microsoft-accent: #2b88d8;
+  --microsoft-background: linear-gradient(120deg, rgba(241, 246, 251, 0.95), rgba(236, 244, 252, 0.92));
+  --microsoft-pattern: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%230078d4' fill-opacity='0.05'%3E%3Cpath d='M0 0h40v40H0zM40 40h40v40H40z'/%3E%3C/g%3E%3C/svg%3E");
+
+  /* Ubuntu theme */
+  --ubuntu-primary: #e95420;
+  --ubuntu-secondary: #ff8936;
+  --ubuntu-accent: #772953;
+  --ubuntu-background: linear-gradient(150deg, rgba(255, 246, 241, 0.95), rgba(255, 251, 248, 0.92));
+  --ubuntu-pattern: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Ccircle cx='40' cy='40' r='16' stroke='%23e95420' stroke-width='2' stroke-opacity='0.05'/%3E%3Ccircle cx='12' cy='40' r='8' stroke='%23772953' stroke-width='2' stroke-opacity='0.05'/%3E%3Ccircle cx='68' cy='40' r='8' stroke='%230e8420' stroke-width='2' stroke-opacity='0.05'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Google theme styles */
+.theme-google {  color-scheme: light;
+  --bg-primary: var(--google-background);
+  --bg-pattern: var(--google-pattern);
+  --text-primary: #202124;
+  --text-secondary: rgba(32, 33, 36, 0.85);
+  --surface-1: rgba(255, 255, 255, 0.8);
+  --surface-2: rgba(255, 255, 255, 0.9);
+  --border-color: rgba(32, 33, 36, 0.12);
+  --highlight: var(--google-primary);
+  --shadow: 0 4px 20px rgba(66, 133, 244, 0.1);
+}
+
+/* Microsoft theme styles */
+.theme-microsoft {
+  color-scheme: light;
+  --bg-primary: var(--microsoft-background);
+  --bg-pattern: var(--microsoft-pattern);
+  --text-primary: #323130;
+  --text-secondary: rgba(50, 49, 48, 0.85);
+  --surface-1: rgba(255, 255, 255, 0.8);
+  --surface-2: rgba(255, 255, 255, 0.9);
+  --border-color: rgba(0, 120, 212, 0.12);
+  --highlight: var(--microsoft-primary);
+  --shadow: 0 4px 20px rgba(0, 120, 212, 0.08);
+}
+
+/* Ubuntu theme styles */
+.theme-ubuntu {
+  color-scheme: light;
+  --bg-primary: var(--ubuntu-background);
+  --bg-pattern: var(--ubuntu-pattern);
+  --text-primary: #111111;
+  --text-secondary: rgba(17, 17, 17, 0.85);
+  --surface-1: rgba(255, 255, 255, 0.7);
+  --surface-2: rgba(255, 255, 255, 0.85);
+  --border-color: rgba(233, 84, 32, 0.12);
+  --highlight: var(--ubuntu-primary);
+  --shadow: 0 6px 24px rgba(233, 84, 32, 0.1);
+}
+
+/* Apply background to body */
+body {
+  background-image: var(--bg-pattern), var(--bg-primary);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Common surface styles */
+.surface {
+  background: var(--surface-1);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.surface-hover:hover {
+  background: var(--surface-2);
+  transform: translateY(-2px);
+  transition: all 0.2s ease;
+}
+
+/* Common text styles */
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.highlight {
+  color: var(--highlight);
+}

@@ -2,6 +2,7 @@
 import { useRouter } from 'vue-router'
 import { useSyncStore } from '../../stores/syncStore'
 import { useOnline } from '@vueuse/core'
+import ThemeSwitcher from '../ThemeSwitcher.vue'
 
 const router = useRouter()
 const syncStore = useSyncStore()
@@ -25,9 +26,9 @@ const sync = async () => {
     <div class="nav-content">
       <router-link to="/" class="nav-brand">
         <h1>我的100个愿望</h1>
-      </router-link>
-
-      <div class="nav-actions">
+      </router-link>      <div class="nav-actions">
+        <ThemeSwitcher />
+        <div class="divider"></div>
         <span class="sync-status" :class="{ offline: !online }">
           {{ online ? syncStore.syncStatus : '离线模式' }}
         </span>
@@ -129,5 +130,16 @@ const sync = async () => {
     padding: 0.375rem 0.75rem;
     font-size: 0.875rem;
   }
+
+  .theme-switcher {
+    display: none;
+  }
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background-color: var(--color-border);
+  margin: 0 1rem;
 }
 </style>
