@@ -13,6 +13,16 @@ const wishStore = useWishStore()
 // 当前显示的愿望数据
 const wish = ref<Wish | null>(null)
 
+// 进度更新表单数据
+const progressForm = ref({
+  current: '',
+  next: '',
+  percentage: 0
+})
+
+// 是否显示更新表单
+const showUpdateForm = ref(false)
+
 // 在组件挂载时获取愿望数据
 onMounted(() => {
   const wishId = Number(route.params.id)
@@ -25,6 +35,35 @@ onMounted(() => {
     router.push('/')
   }
 })
+
+// 更新进度
+const updateProgress = async () => {
+  if (!wish.value) return
+  
+  try {
+    await wishStore.updateProgress(wish.value.id, {
+      current: progressForm.value.current,
+      next: progressForm.value.next,
+      percentage: progressForm.value.percentage
+    })
+    
+    // 重新加载愿望数据
+    const updatedWish = wishStore.wishes.find(w => w.id === wish.value?.id)
+    if (updatedWish) {
+      wish.value = updatedWish
+    }
+    
+    // 重置表单
+    showUpdateForm.value = false
+    progressForm.value = {
+      current: '',
+      next: '',
+      percentage: 0
+    }
+  } catch (error) {
+    console.error('Failed to update progress:', error)
+  }
+}
 </script>
 
 <template>
@@ -43,9 +82,57 @@ onMounted(() => {
       <div class="main-info">
         <p class="description">{{ wish.description }}</p>
         
-        <div v-if="wish.progress" class="progress-section">
-          <h3>进展情况</h3>
-          <div class="progress-info">
+        <div class="progress-section">
+          <div class="progress-header">
+            <h3>进展情况</h3>
+            <button 
+              class="update-btn"
+              @click="showUpdateForm = !showUpdateForm"
+            >
+              {{ showUpdateForm ? '取消' : '更新进度' }}
+            </button>
+          </div>
+
+          <div v-if="showUpdateForm" class="update-form">
+            <div class="form-group">
+              <label>当前进度</label>
+              <textarea 
+                v-model="progressForm.current"
+                placeholder="描述当前完成的内容..."
+                rows="3"
+              ></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label>下一步计划</label>
+              <textarea 
+                v-model="progressForm.next"
+                placeholder="描述下一步的计划..."
+                rows="3"
+              ></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label>完成度 ({{ progressForm.percentage }}%)</label>
+              <input 
+                type="range" 
+                v-model.number="progressForm.percentage"
+                min="0"
+                max="100"
+                step="5"
+              >
+            </div>
+            
+            <button 
+              class="submit-btn"
+              @click="updateProgress"
+              :disabled="!progressForm.current"
+            >
+              提交更新
+            </button>
+          </div>
+
+          <div v-else-if="wish.progress" class="progress-info">
             <p><strong>当前进度：</strong>{{ wish.progress.current }}</p>
             <p v-if="wish.progress.next"><strong>下一步：</strong>{{ wish.progress.next }}</p>
             <div class="progress-bar">
@@ -54,6 +141,9 @@ onMounted(() => {
                 :style="{ width: `${wish.progress.percentage || 0}%` }"
               ></div>
             </div>
+          </div>
+          <div v-else class="empty-progress">
+            <p>还没有更新进度，点击"更新进度"开始记录吧！</p>
           </div>
         </div>
       </div>
@@ -119,9 +209,66 @@ onMounted(() => {
   border-radius: var(--radius-md);
 }
 
-.progress-section h3 {
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.update-btn {
+  background-color: var(--color-primary);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+}
+
+.update-form {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
   margin-bottom: 1rem;
-  color: var(--color-gray-900);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--color-gray-700);
+}
+
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-group input[type="range"] {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.submit-btn {
+  width: 100%;
+  background-color: var(--color-primary);
+  color: white;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .progress-info p {
@@ -141,6 +288,12 @@ onMounted(() => {
   background-color: var(--color-primary);
   border-radius: var(--radius-full);
   transition: width 0.3s ease;
+}
+
+.empty-progress {
+  text-align: center;
+  color: var(--color-gray-500);
+  padding: 2rem 0;
 }
 
 @media (max-width: 768px) {
