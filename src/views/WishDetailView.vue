@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useWishStore } from '../stores/wishStore'
 import type { Wish } from '../types/wish'
+import AchievementPanel from '../components/rewards/AchievementPanel.vue'
 
 // 获取路由实例和参数
 const route = useRoute()
@@ -28,85 +29,127 @@ onMounted(() => {
 
 <template>
   <div class="wish-detail" v-if="wish">
-    <h1>{{ wish.title }}</h1>
-    
-    <div class="detail-section">
-      <h2>详细描述</h2>
-      <p>{{ wish.description }}</p>
+    <div class="detail-header">
+      <h1>{{ wish.title }}</h1>
+      <button 
+        class="edit-btn"
+        @click="router.push(`/wish/${wish.id}/edit`)"
+      >
+        编辑愿望
+      </button>
     </div>
 
-    <div class="status-section">
-      <h2>当前状态</h2>
-      <div class="status-badge">
-        {{ wish.status === 'pending' ? '待开始' : 
-           wish.status === 'in-progress' ? '进行中' : '已完成' }}
-      </div>
-    </div>
-
-    <div class="progress-section" v-if="wish.progress">
-      <h2>进展情况</h2>
-      <div class="progress-content">
-        <div class="progress-item">
-          <h3>当前进展</h3>
-          <p>{{ wish.progress.current }}</p>
+    <div class="detail-content">
+      <div class="main-info">
+        <p class="description">{{ wish.description }}</p>
+        
+        <div v-if="wish.progress" class="progress-section">
+          <h3>进展情况</h3>
+          <div class="progress-info">
+            <p><strong>当前进度：</strong>{{ wish.progress.current }}</p>
+            <p v-if="wish.progress.next"><strong>下一步：</strong>{{ wish.progress.next }}</p>
+            <div class="progress-bar">
+              <div 
+                class="progress-fill"
+                :style="{ width: `${wish.progress.percentage || 0}%` }"
+              ></div>
+            </div>
+          </div>
         </div>
-        <div class="progress-item">
-          <h3>未来计划</h3>
-          <p>{{ wish.progress.next }}</p>
-        </div>
       </div>
-    </div>
 
-    <div class="timestamps">
-      <p>创建时间：{{ new Date(wish.createdAt).toLocaleString() }}</p>
-      <p>最后更新：{{ new Date(wish.updatedAt).toLocaleString() }}</p>
+      <div class="rewards-section">
+        <AchievementPanel :wish="wish" />
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
 .wish-detail {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 2rem;
 }
 
-.detail-section,
-.status-section,
-.progress-section {
-  margin-top: 30px;
-  padding: 20px;
-  background: white;
-  border-radius: 8px;
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.detail-header h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--color-gray-900);
+}
+
+.edit-btn {
+  background-color: var(--color-primary);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+}
+
+.detail-content {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 2rem;
+}
+
+.main-info {
+  background-color: white;
+  padding: 2rem;
+  border-radius: var(--radius-lg);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.status-badge {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 4px;
-  background-color: #f0f0f0;
-  font-weight: bold;
+.description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--color-gray-700);
+  margin-bottom: 2rem;
 }
 
-.progress-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-top: 20px;
+.progress-section {
+  background-color: var(--color-gray-50);
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
 }
 
-.progress-item {
-  padding: 15px;
-  background: #f8f8f8;
-  border-radius: 6px;
+.progress-section h3 {
+  margin-bottom: 1rem;
+  color: var(--color-gray-900);
 }
 
-.timestamps {
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 1px solid #eee;
-  color: #666;
-  font-size: 0.9em;
+.progress-info p {
+  margin-bottom: 0.5rem;
+}
+
+.progress-bar {
+  height: 8px;
+  background-color: var(--color-gray-200);
+  border-radius: var(--radius-full);
+  margin-top: 1rem;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .detail-content {
+    grid-template-columns: 1fr;
+  }
+
+  .wish-detail {
+    padding: 1rem;
+  }
 }
 </style>

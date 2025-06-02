@@ -26,9 +26,24 @@ const statusClass = computed(() => ({
 
 <template>
   <div class="wish-card">
+    <div class="wish-header">
+      <div class="wish-points" v-if="wish.rewards?.points">
+        +{{ wish.rewards.points }} 分
+      </div>
+      <div class="streak-badge" v-if="wish.streakDays && wish.streakDays > 0">
+        🔥 {{ wish.streakDays }}天
+      </div>
+    </div>
     <div class="wish-content">
       <h3 class="wish-title">{{ wish.id }} - {{ wish.title }}</h3>
       <p class="wish-description">{{ wish.description }}</p>
+      <div class="motivation-bar" v-if="wish.motivation">
+        <div 
+          class="motivation-fill"
+          :style="{ width: `${wish.motivation}%` }"
+          :class="{ 'high': wish.motivation >= 70, 'medium': wish.motivation >= 30 && wish.motivation < 70, 'low': wish.motivation < 30 }"
+        ></div>
+      </div>
       <div class="wish-progress" v-if="wish.progress">
         <p class="current">当前: {{ wish.progress.current }}</p>
         <p class="next" v-if="wish.progress.next">下一步: {{ wish.progress.next }}</p>
@@ -112,5 +127,83 @@ const statusClass = computed(() => ({
 .status-completed {
   background-color: var(--color-success);
   color: white;
+}
+
+.wish-header {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding: 1rem 1rem 0;
+}
+
+.motivation-bar {
+  height: 4px;
+  background-color: var(--color-gray-200);
+  border-radius: var(--radius-full);
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+.motivation-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+}
+
+.motivation-fill.high {
+  background-color: #22c55e;
+}
+
+.motivation-fill.medium {
+  background-color: #eab308;
+}
+
+.motivation-fill.low {
+  background-color: #ef4444;
+}
+
+.wish-points {
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.streak-badge {
+  background-color: #ffedd5;
+  color: #ea580c;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.motivation-bar {
+  height: 4px;
+  background-color: var(--color-gray-200);
+  border-radius: var(--radius-full);
+  margin-top: 1rem;
+  overflow: hidden;
+}
+
+.motivation-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+}
+
+.motivation-fill.high {
+  background-color: #22c55e;
+}
+
+.motivation-fill.medium {
+  background-color: #eab308;
+}
+
+.motivation-fill.low {
+  background-color: #ef4444;
 }
 </style>
