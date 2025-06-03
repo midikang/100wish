@@ -1,7 +1,7 @@
 // 基础 URL 配置
 export const API_CONFIG = {
   development: 'http://localhost:3000/api',
-  production: 'https://100wishplan.hostwinds.com/api'
+  production: 'https://100wish.midikang.com/api'
 }
 
 // 获取当前环境的 API URL
@@ -12,7 +12,7 @@ export const getApiBaseUrl = () => {
 // API 路径配置
 export const API_PATHS = {
   wishes: '/wishes',
-  sync: '/sync',
+  sync: '/wishes/sync',
   auth: '/auth'
 }
 
