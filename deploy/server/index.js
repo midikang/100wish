@@ -27,8 +27,21 @@ const PORT = process.env.PORT || 3000;
 
 // 中间件配置
 app.use(express.json());
-app.use(cors());
-app.use(helmet());
+
+// 配置 CORS，允许前端域名访问
+app.use(cors({
+  origin: ['http://100wish.midikang.com', 'https://100wish.midikang.com', 'http://localhost:3000', 'http://localhost:5173'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
+// 安全相关
+app.use(helmet({
+  contentSecurityPolicy: false, // 适当调整 CSP 策略
+  crossOriginResourcePolicy: { policy: 'cross-origin' }
+}));
+
 app.use(morgan('dev'));
 
 // 限制请求速率
@@ -42,6 +55,38 @@ app.use(limiter);
 sequelize.sync()
   .then(() => console.log('Database synced'))
   .catch(err => console.error('Failed to sync database:', err));
+
+// 处理 OPTIONS 预检请求
+app.options('*', (req, res) => {
+  res.status(200).end();
+});
+
+// 健康检查端点
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'Server is running' });
+});
+
+// 添加调试中间件
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
+// 添加测试端点
+app.get('/api/test', (req, res) => {
+  res.json({ success: true, message: 'API测试成功' });
+});
+
+// 检查同步端点是否可用
+app.get('/api/check-sync', (req, res) => {
+  res.json({ 
+    endpoints: {
+      sync: '/api/wishes/sync',
+      wishes: '/api/wishes',
+      health: '/api/health'
+    }
+  });
+});
 
 // 路由
 app.use('/api/wishes', wishRoutes);

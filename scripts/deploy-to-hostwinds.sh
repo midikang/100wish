@@ -19,16 +19,17 @@ echo "2. 打包前端文件..."
 pwsh -Command "Compress-Archive -Path ./deploy/assets/*,./deploy/index.html,./deploy/vite.svg -DestinationPath ./deploy/front.zip -Force"
 
 # 3. 上传文件到服务器
-echo "3. 上传文件到服务器..."
-echo "正在上传服务器文件..."
-scp -i "$SSH_KEY" ./deploy/server.zip "$SERVER_USER@$SERVER_IP:$SERVER_PATH/"
+# echo "3. 上传文件到服务器..."
+# echo "正在上传服务器文件..."
+# scp -i "$SSH_KEY" ./deploy/server.zip "$SERVER_USER@$SERVER_IP:$SERVER_PATH/"
 
-echo "正在上传前端文件..."
-scp -i "$SSH_KEY" ./deploy/front.zip "$SERVER_USER@$SERVER_IP:$SERVER_PATH/"
+# echo "正在上传前端文件..."
+# scp -i "$SSH_KEY" ./deploy/front.zip "$SERVER_USER@$SERVER_IP:$SERVER_PATH/"
 
-# 4. 在服务器上执行部署脚本
-echo "4. 在服务器上执行部署脚本..."
-ssh -i "$SSH_KEY" "$SERVER_USER@$SERVER_IP" "cd $SERVER_PATH && unzip -o front.zip -d ./ && chmod +x deploy.sh && ./deploy.sh"
+# # 4. 在服务器上执行部署脚本
+# echo "4. 在服务器上执行部署脚本..."
+# ssh -i "$SSH_KEY" "$SERVER_USER@$SERVER_IP" "cd $SERVER_PATH && unzip -o front.zip -d ./ && chmod +x deploy.sh && ./deploy.sh"
+
 
 echo ""
 echo "=== 部署完成！ ==="

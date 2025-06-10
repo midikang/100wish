@@ -55,9 +55,15 @@ router.delete('/:id', asyncHandler(async (req, res) => {
 }));
 
 // 同步愿望数据
+// 正确配置路由，确保可以通过 /api/wishes/sync 访问
 router.post('/sync', asyncHandler(async (req, res) => {
-  const clientWishes = req.body;
-  const clientWishIds = new Set(clientWishes.map(w => w.id));
+  console.log('同步请求已接收, 请求体类型:', typeof req.body, 
+    '是数组:', Array.isArray(req.body), 
+    '内容长度:', Array.isArray(req.body) ? req.body.length : '未知');
+  
+  // 确保 req.body 是数组
+  const clientWishes = Array.isArray(req.body) ? req.body : [];
+  const clientWishIds = new Set(clientWishes.map(w => w.id || ''));
   
   try {
     // 1. 获取所有服务器端的愿望

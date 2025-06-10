@@ -1,7 +1,7 @@
 {
   "name": "100wishplan",
   "private": true,
-  "version": "0.5.7",
+  "version": "0.9.0",
   "homepage": "https://midikang.github.io/100wish/",
   "type": "module",
   "scripts": {

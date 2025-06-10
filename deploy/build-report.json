@@ -1,6 +1,6 @@
 {
-  "version": "v0.5.7",
-  "buildTime": "2025-06-03T05:54:19.338Z",
+  "version": "v0.9.0",
+  "buildTime": "2025-06-03T07:41:28.859Z",
   "files": [
     {
       "path": "assets\\index-BgJ0l735.css",
@@ -40,7 +40,7 @@
     },
     {
       "path": "server\\index.js",
-      "size": 1557
+      "size": 2750
     },
     {
       "path": "server\\models\\database.js",
@@ -19024,12 +19024,12 @@
     },
     {
       "path": "server\\routes\\wishes.js",
-      "size": 2927
+      "size": 3266
     },
     {
       "path": "vite.svg",
       "size": 1497
     }
   ],
-  "size": 30370856
+  "size": 30372388
 }
