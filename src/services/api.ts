@@ -4,8 +4,8 @@ import { getApiBaseUrl, API_PATHS } from '../config/api.config'
 
 // 创建 axios 实例
 const api = axios.create({
-  // 在生产环境中替换为实际的API地址
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
+  // 使用统一配置的API地址
+  baseURL: getApiBaseUrl(),
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json'

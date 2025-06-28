@@ -2,6 +2,13 @@
 
 这是一个用于追踪和管理个人愿望清单的Vue3应用程序。通过这个应用，你可以记录、更新和追踪你的愿望实现过程。
 
+## 检查
+- 停止现有的服务并重新启动：
+netstat -ano | findstr :3000
+
+- 查找所有 node 进程
+Get-Process | Where-Object { $_.ProcessName -eq "node" }
+
 ## 项目特点
 
 - 使用 Vue 3 + TypeScript + Vite 构建

@@ -13,6 +13,7 @@ const currentProgress = ref('')
 const futurePlan = ref('')
 
 const submitForm = () => {
+  debugger;
   const newWish = {
     title: title.value,
     description: description.value,

@@ -5,7 +5,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
 import { router as wishRoutes } from './routes/wishes.js';
-import sequelize from './models/database.js';
+import { dbOperations } from './models/database.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import fs from 'fs';
@@ -51,10 +51,8 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// 数据库连接
-sequelize.sync()
-  .then(() => console.log('Database synced'))
-  .catch(err => console.error('Failed to sync database:', err));
+// 数据库初始化 - 不再需要 Sequelize 同步
+console.log('SQLite database initialized');
 
 // 处理 OPTIONS 预检请求
 app.options('*', (req, res) => {

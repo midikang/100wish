@@ -39,8 +39,6 @@ export interface Wish {
   streakDays?: number;
   /** 最后一次更新时间 */
   lastUpdated?: string;
-    next?: string;
-  };
   /** 创建时间 */
   createdAt: Date | string;
   /** 最后更新时间 */

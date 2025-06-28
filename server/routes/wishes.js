@@ -1,21 +1,19 @@
 import express from 'express';
 import asyncHandler from 'express-async-handler';
-import Wish from '../models/wish.js';
-import { Op } from 'sequelize';
+import { dbOperations } from '../models/database.js';
+import { validateWishData, formatWishData } from '../models/wish.js';
 
 export const router = express.Router();
 
 // 获取所有愿望
 router.get('/', asyncHandler(async (req, res) => {
-  const wishes = await Wish.findAll({
-    order: [['createdAt', 'DESC']]
-  });
+  const wishes = await dbOperations.getAllWishes();
   res.json(wishes);
 }));
 
 // 获取单个愿望
 router.get('/:id', asyncHandler(async (req, res) => {
-  const wish = await Wish.findByPk(req.params.id);
+  const wish = await dbOperations.getWishById(req.params.id);
   if (!wish) {
     res.status(404).json({ message: 'Wish not found' });
     return;
@@ -25,28 +23,43 @@ router.get('/:id', asyncHandler(async (req, res) => {
 
 // 创建新愿望
 router.post('/', asyncHandler(async (req, res) => {
-  const wish = await Wish.create(req.body);
+  debugger;
+  // 验证数据
+  const errors = validateWishData(req.body);
+  if (errors.length > 0) {
+    res.status(400).json({ message: 'Validation failed', errors });
+    return;
+  }
+  
+  // 格式化数据
+  const wishData = formatWishData(req.body);
+  const wish = await dbOperations.createWish(wishData);
   res.status(201).json(wish);
 }));
 
 // 更新愿望
 router.put('/:id', asyncHandler(async (req, res) => {
-  const [updated] = await Wish.update(req.body, {
-    where: { id: req.params.id }
-  });
-  if (!updated) {
+  // 验证数据
+  const errors = validateWishData(req.body);
+  if (errors.length > 0) {
+    res.status(400).json({ message: 'Validation failed', errors });
+    return;
+  }
+  
+  // 格式化数据
+  const wishData = formatWishData(req.body);
+  const wish = await dbOperations.updateWish(req.params.id, wishData);
+  
+  if (!wish) {
     res.status(404).json({ message: 'Wish not found' });
     return;
   }
-  const wish = await Wish.findByPk(req.params.id);
   res.json(wish);
 }));
 
 // 删除愿望
 router.delete('/:id', asyncHandler(async (req, res) => {
-  const deleted = await Wish.destroy({
-    where: { id: req.params.id }
-  });
+  const deleted = await dbOperations.deleteWish(req.params.id);
   if (!deleted) {
     res.status(404).json({ message: 'Wish not found' });
     return;
@@ -55,7 +68,6 @@ router.delete('/:id', asyncHandler(async (req, res) => {
 }));
 
 // 同步愿望数据
-// 正确配置路由，确保可以通过 /api/wishes/sync 访问
 router.post('/sync', asyncHandler(async (req, res) => {
   console.log('同步请求已接收, 请求体类型:', typeof req.body, 
     '是数组:', Array.isArray(req.body), 
@@ -63,39 +75,10 @@ router.post('/sync', asyncHandler(async (req, res) => {
   
   // 确保 req.body 是数组
   const clientWishes = Array.isArray(req.body) ? req.body : [];
-  const clientWishIds = new Set(clientWishes.map(w => w.id || ''));
   
   try {
-    // 1. 获取所有服务器端的愿望
-    const serverWishes = await Wish.findAll();
-    const serverWishIds = new Set(serverWishes.map(w => w.id));
-    
-    // 2. 处理客户端的数据
-    for (const clientWish of clientWishes) {
-      const serverWish = serverWishes.find(w => w.id === clientWish.id);
-      
-      if (!serverWish) {
-        // 服务器端不存在，创建新记录
-        await Wish.create(clientWish);
-      } else if (new Date(clientWish.updatedAt) > serverWish.updatedAt) {
-        // 客户端版本更新，更新服务器数据
-        await serverWish.update(clientWish);
-      }
-    }
-    
-    // 3. 确保客户端有所有服务器端的数据
-    for (const serverWish of serverWishes) {
-      if (!clientWishIds.has(serverWish.id)) {
-        // 客户端缺少此记录，需要在响应中包含
-        clientWishes.push(serverWish.toJSON());
-      }
-    }
-    
-    // 4. 返回完整的同步后数据
-    const finalWishes = await Wish.findAll({
-      order: [['updatedAt', 'DESC']]
-    });
-    
+    // 使用新的同步方法
+    const finalWishes = await dbOperations.syncWishes(clientWishes);
     res.json(finalWishes);
     
   } catch (error) {
