@@ -17,17 +17,16 @@ const submitForm = () => {
   const newWish = {
     title: title.value,
     description: description.value,
-    status: 'pending',
+    status: 'pending' as 'pending',
     ...(currentProgress.value || futurePlan.value
       ? {
           progress: {
             current: currentProgress.value,
-            future: futurePlan.value,
+            next: futurePlan.value,
+            percentage: 0,
           },
         }
       : {}),
-      createdAt: new Date().toLocaleString(),
-      updatedAt: new Date().toLocaleString(),
   }
 
   wishStore.addWish(newWish)

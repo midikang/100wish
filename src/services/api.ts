@@ -82,13 +82,13 @@ export const wishApi = {
   },
 
   // 创建新愿望
-  async createWish(wish: Omit<Wish, 'id'>) {
+  async createWish(wish: Omit<Wish, 'id' | 'createdAt' | 'updatedAt'>) {
     const { data } = await api.post<Wish>('/wishes', wish)
     return data
   },
 
   // 更新愿望
-  async updateWish(id: number, wish: Partial<Wish>) {
+  async updateWish(id: number, wish: Partial<Omit<Wish, 'id' | 'createdAt' | 'updatedAt'>>) {
     const { data } = await api.put<Wish>(`/wishes/${id}`, wish)
     return data
   },

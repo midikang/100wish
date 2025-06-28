@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import type { Wish } from '../types/wish'
 import { db, initializeDatabase } from '../db/database'
+import { wishApi } from '../services/api' // 引入 API 服务
 
 /**
  * Pinia Store 的状态接口定义
@@ -54,44 +55,57 @@ export const useWishStore = defineStore('wish', {
   actions: {
     /**
      * 初始化加载愿望
+     * 1. 从服务器获取最新数据
+     * 2. 清空本地 IndexedDB
+     * 3. 将服务器数据存入本地 IndexedDB
+     * 4. 更新 Pinia State
      */
     async loadWishes() {
-      this.loading = true;
-      this.error = null;
-      
+      this.loading = true
+      this.error = null
+
       try {
         await initializeDatabase()
-        this.wishes = await db.wishes.toArray()
+        // 1. 从服务器获取
+        const serverWishes = await wishApi.getAllWishes()
+        // 2. 清空本地
+        await db.wishes.clear()
+        // 3. 写入本地
+        await db.wishes.bulkAdd(serverWishes)
+        // 4. 更新 State
+        this.wishes = serverWishes
       } catch (error: any) {
-        this.error = error.message || '加载愿望失败';
-        console.error('加载愿望失败:', error);
+        this.error = error.message || '从服务器加载愿望失败'
+        console.error('从服务器加载愿望失败:', error)
+        // [可选] 在API失败时，可以尝试从本地数据库加载作为后备
+        // this.wishes = await db.wishes.toArray()
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
 
     /**
      * 添加新的愿望
+     * 1. 调用 API 将新愿望发送到服务器
+     * 2. 成功后，重新加载所有愿望以确保数据同步
      * @param wish - 新愿望的数据
      */
-    async addWish(wish: Omit<Wish, 'id' >) {
-      this.loading = true;
-      this.error = null;
-      
+    async addWish(wish: Omit<Wish, 'id' | 'createdAt' | 'updatedAt'>) {
+      this.loading = true
+      this.error = null
+
       try {
-        const id = await db.wishes.add({
-          ...wish,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        })
+        // 1. 调用 API 创建愿望
+        const newWish = await wishApi.createWish(wish)
+        // 2. 重新加载所有愿望列表
         await this.loadWishes()
-        return id
+        return newWish.id
       } catch (error: any) {
-        this.error = error.message || '添加愿望失败';
-        console.error('添加愿望失败:', error);
-        throw error;
+        this.error = error.message || '添加愿望失败'
+        console.error('添加愿望失败:', error)
+        throw error
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
 
@@ -162,6 +176,13 @@ export const useWishStore = defineStore('wish', {
         const wish = await db.wishes.get(id)
         if (!wish) throw new Error('愿望不存在')
 
+        // 确保 progressUpdate.next 始终存在
+        const progress: { current: string; next: string; percentage: number } = {
+          current: progressUpdate.current,
+          next: progressUpdate.next ?? '',
+          percentage: progressUpdate.percentage
+        }
+
         // 计算基础奖励点数
         let pointsEarned = 10 // 基础点数
         let newMotivation = wish.motivation || 50 // 默认动力值
@@ -196,18 +217,16 @@ export const useWishStore = defineStore('wish', {
 
         // 检查是否达成新的里程碑
         const milestone = this.checkMilestone(progressUpdate.percentage)
-        const currentBadges = wish.rewards?.badges || []
-        const newBadges = [...currentBadges]
-        if (milestone && !currentBadges.includes(milestone.badge)) {
-          newBadges.push(milestone.badge)
-          pointsEarned += milestone.points
-        }
-
+        // 计算新徽章列表
+        const prevBadges = wish.rewards?.badges || [];
+        const newBadges = milestone && milestone.badge && !prevBadges.includes(milestone.badge)
+          ? [...prevBadges, milestone.badge]
+          : prevBadges;
         // 更新愿望数据
         await db.wishes.update(id, {
-          progress: progressUpdate,
-          status: progressUpdate.percentage >= 100 ? 'completed' : 
-                 progressUpdate.percentage > 0 ? 'in-progress' : 'pending',
+          progress: progress,
+          status: progress.percentage >= 100 ? 'completed' : 
+                 progress.percentage > 0 ? 'in-progress' : 'pending',
           rewards: {
             points: (wish.rewards?.points || 0) + pointsEarned,
             badges: newBadges,
