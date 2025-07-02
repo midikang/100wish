@@ -114,15 +114,37 @@ export const useWishStore = defineStore('wish', {
      * @param id - 要更新的愿望 ID
      * @param updates - 要更新的字段和值
      */
-    async updateWish(id: number, updates: Partial<Wish>) {
+    /**
+     * 更新现有愿望的信息，并自动追加历史记录
+     * @param id - 要更新的愿望 ID
+     * @param updates - 要更新的字段和值
+     * @param historyDesc - 本次更新的说明（可选）
+     */
+    async updateWish(id: number, updates: Partial<Wish>, historyDesc?: string) {
       this.loading = true;
       this.error = null;
-      
       try {
-        await db.wishes.update(id, {
+        // 1. 获取当前愿望
+        const wish = this.wishes.find(w => w.id === id)
+        if (!wish) throw new Error('愿望不存在')
+        // 2. 构造新的历史记录
+        const newHistory = [
+          ...(wish.history || []),
+          {
+            time: new Date().toISOString(),
+            desc: historyDesc || '更新愿望',
+            data: updates
+          }
+        ]
+        // 3. 合成新的 wish 数据
+        const newWish = {
+          ...wish,
           ...updates,
-          updatedAt: new Date().toISOString()
-        })
+          history: newHistory
+        }
+        // 4. 调用后端 API 更新
+        await wishApi.updateWish(id, newWish)
+        // 5. 重新加载所有愿望
         await this.loadWishes()
       } catch (error: any) {
         this.error = error.message || '更新愿望失败';

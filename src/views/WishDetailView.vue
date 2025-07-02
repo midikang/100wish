@@ -152,6 +152,18 @@ const updateProgress = async () => {
         <AchievementPanel :wish="wish" />
       </div>
     </div>
+
+    <!-- 新增：历史记录展示 -->
+    <div v-if="wish.history && wish.history.length" class="history-section">
+      <h3>更新历史</h3>
+      <ul class="history-list">
+        <li v-for="(item, idx) in wish.history" :key="idx" class="history-item">
+          <div class="history-time">{{ new Date(item.time).toLocaleString() }}</div>
+          <div class="history-desc">{{ item.desc }}</div>
+          <pre class="history-data">{{ item.data }}</pre>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -294,6 +306,39 @@ const updateProgress = async () => {
   text-align: center;
   color: var(--color-gray-500);
   padding: 2rem 0;
+}
+
+.history-section {
+  margin-top: 2.5rem;
+  background: #f8f9fa;
+  border-radius: var(--radius-md);
+  padding: 1.5rem 2rem;
+}
+.history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.history-item {
+  border-bottom: 1px solid #eee;
+  padding: 0.75rem 0;
+}
+.history-time {
+  color: #888;
+  font-size: 0.95rem;
+}
+.history-desc {
+  font-weight: 500;
+  margin: 0.2rem 0 0.3rem 0;
+}
+.history-data {
+  background: #fff;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.95rem;
+  color: #444;
+  white-space: pre-wrap;
+  margin: 0.2rem 0 0 0;
 }
 
 @media (max-width: 768px) {
