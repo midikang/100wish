@@ -7,6 +7,26 @@ import { computed, ref } from 'vue'
 const wishStore = useWishStore()
 const selectedStatus = ref('全部')
 const loading = ref(true)
+const deletingId = ref<number|null>(null)
+const showDeleteConfirm = ref(false)
+
+function onDeleteClick(id: number) {
+  deletingId.value = id
+  showDeleteConfirm.value = true
+}
+
+async function confirmDelete() {
+  if (deletingId.value != null) {
+    await wishStore.deleteWish(deletingId.value)
+    deletingId.value = null
+    showDeleteConfirm.value = false
+  }
+}
+
+function cancelDelete() {
+  deletingId.value = null
+  showDeleteConfirm.value = false
+}
 
 // 立即加载愿望列表
 wishStore.loadWishes().finally(() => {
@@ -54,17 +74,25 @@ const filteredWishes = computed(() => {
     </div>
 
     <div class="grid-container">
-      <WishCard
-        v-for="wish in filteredWishes"
-        :key="wish.id"
-        :wish="wish"
-        @click="$router.push(`/wish/${wish.id}`)"
-        class="wish-card-item"
-      />
+      <div v-for="wish in filteredWishes" :key="wish.id" class="wish-card-item">
+        <WishCard
+          :wish="wish"
+          @click="$router.push(`/wish/${wish.id}`)"
+        />
+        <button class="delete-btn" @click.stop="onDeleteClick(wish.id)">删除</button>
+      </div>
     </div>
 
     <div v-if="wishes.length === 0" class="empty-state">
       <p>还没有添加任何愿望，点击右上角的"新建愿望"开始吧！</p>
+    </div>
+
+    <div v-if="showDeleteConfirm" class="delete-confirm-modal">
+      <div class="modal-content">
+        <p>确定要删除这个愿望吗？此操作不可撤销。</p>
+        <button @click="confirmDelete()" class="confirm-btn">确认删除</button>
+        <button @click="cancelDelete()" class="cancel-btn">取消</button>
+      </div>
     </div>
   </div>
 </template>
@@ -140,6 +168,55 @@ const filteredWishes = computed(() => {
   text-align: center;
   padding: 2rem;
   color: var(--color-gray-500);
+}
+
+.delete-btn {
+  margin-top: 0.5rem;
+  background: #ff4d4f;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.2s;
+}
+.delete-btn:hover {
+  background: #d9363e;
+}
+
+.delete-confirm-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-content {
+  background: #fff;
+  padding: 2rem 2.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+  text-align: center;
+}
+.confirm-btn {
+  background: #ff4d4f;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1.5rem;
+  margin-right: 1rem;
+  cursor: pointer;
+}
+.cancel-btn {
+  background: #eee;
+  color: #333;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1.5rem;
+  cursor: pointer;
 }
 
 @media (max-width: 640px) {

@@ -137,12 +137,17 @@ export const useWishStore = defineStore('wish', {
      * 删除指定的愿望
      * @param id - 要删除的愿望 ID
      */
+    /**
+     * 删除指定的愿望（调用后端 API 并同步本地）
+     * @param id - 要删除的愿望 ID
+     */
     async deleteWish(id: number) {
       this.loading = true;
       this.error = null;
-      
       try {
-        await db.wishes.delete(id);
+        // 1. 调用后端 API 删除
+        await wishApi.deleteWish(id);
+        // 2. 重新加载所有愿望
         await this.loadWishes();
       } catch (error: any) {
         this.error = error.message || '删除愿望失败';
