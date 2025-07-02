@@ -1,7 +1,8 @@
 // 基础 URL 配置
 export const API_CONFIG = {
   development: 'http://localhost:3000/api',
-  production: 'https://100wish.midikang.com/api'
+ // production: 'https://100wish.midikang.com/api'
+  production: 'http://100wish.midikang.com:3000/api'
 }
 
 // 获取当前环境的 API URL

@@ -28,9 +28,17 @@ const PORT = process.env.PORT || 3000;
 // 中间件配置
 app.use(express.json());
 
+// 部署在服务器上，运行网站，按F12  api。 https://100wish.midikang.com/api/wishes 报404错误
+// http://100wish.midikang.com/api/wishes 404
+// http://100wish.midikang.com:3000/api/wishes 不报错
+// 
+
+// 在服务器上，可以访问 地址：http://100wish.midikang.com:3000/api/wishes
+// 在cors中，也加入这个地址。然后
+
 // 配置 CORS，允许前端域名访问
 app.use(cors({
-  origin: ['http://100wish.midikang.com', 'https://100wish.midikang.com', 'http://localhost:3000', 'http://localhost:5173'],
+  origin: ['http://100wish.midikang.com:3000','http://100wish.midikang.com', 'https://100wish.midikang.com', 'http://localhost:3000', 'http://localhost:5173'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
