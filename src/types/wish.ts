@@ -43,4 +43,15 @@ export interface Wish {
   createdAt: Date | string;
   /** 最后更新时间 */
   updatedAt: Date | string;
+  /**
+   * 历史记录，每次更新都会追加一条
+   * time: ISO 时间字符串
+   * desc: 变更说明
+   * data: 变更内容
+   */
+  history?: Array<{
+    time: string;
+    desc: string;
+    data: any;
+  }>;
 }
