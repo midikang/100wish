@@ -36,6 +36,7 @@ const createTableSQL = `
     motivation INTEGER DEFAULT 0,
     streakDays INTEGER DEFAULT 0,
     lastUpdated DATETIME,
+    history TEXT DEFAULT '[]', -- 新增字段，存储历史记录
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
   )
@@ -65,7 +66,8 @@ export const dbOperations = {
           const wishes = rows.map(row => ({
             ...row,
             progress: JSON.parse(row.progress || '{}'),
-            rewards: JSON.parse(row.rewards || '{}')
+            rewards: JSON.parse(row.rewards || '{}'),
+            history: JSON.parse(row.history || '[]')
           }));
           resolve(wishes);
         }
@@ -84,7 +86,8 @@ export const dbOperations = {
           const wish = {
             ...row,
             progress: JSON.parse(row.progress || '{}'),
-            rewards: JSON.parse(row.rewards || '{}')
+            rewards: JSON.parse(row.rewards || '{}'),
+            history: JSON.parse(row.history || '[]')
           };
           resolve(wish);
         } else {
@@ -99,8 +102,8 @@ export const dbOperations = {
       const sql = `
         INSERT INTO wishes (
           title, description, status, progress, rewards, 
-          motivation, streakDays, lastUpdated, createdAt, updatedAt
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+          motivation, streakDays, lastUpdated, history, createdAt, updatedAt
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       `;
       const params = [
         wishData.title,
@@ -110,9 +113,9 @@ export const dbOperations = {
         JSON.stringify(wishData.rewards || {}),
         wishData.motivation || 0,
         wishData.streakDays || 0,
-        wishData.lastUpdated || null
+        wishData.lastUpdated || null,
+        JSON.stringify(wishData.history || [])
       ];
-      
       db.run(sql, params, function(err) {
         if (err) {
           reject(err);
@@ -130,7 +133,7 @@ export const dbOperations = {
       const sql = `
         UPDATE wishes 
         SET title = ?, description = ?, status = ?, progress = ?, rewards = ?, 
-            motivation = ?, streakDays = ?, lastUpdated = ?, updatedAt = CURRENT_TIMESTAMP
+            motivation = ?, streakDays = ?, lastUpdated = ?, history = ?, updatedAt = CURRENT_TIMESTAMP
         WHERE id = ?
       `;
       const params = [
@@ -142,9 +145,9 @@ export const dbOperations = {
         wishData.motivation || 0,
         wishData.streakDays || 0,
         wishData.lastUpdated || null,
+        JSON.stringify(wishData.history || []),
         id
       ];
-      
       db.run(sql, params, function(err) {
         if (err) {
           reject(err);
