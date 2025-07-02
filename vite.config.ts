@@ -29,6 +29,7 @@ export default defineConfig(({ command, mode }) => {
     base: '/', // 直接部署在域名根目录下
     // 使用 Hostwinds 的反向代理配置
     server: {
+      host: true, // 允许局域网和本机所有IP访问
       proxy: {
         '/api': {
           target: env.VITE_API_BASE_URL,
