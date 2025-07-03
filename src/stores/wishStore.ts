@@ -128,10 +128,13 @@ export const useWishStore = defineStore('wish', {
         const wish = this.wishes.find(w => w.id === id)
         if (!wish) throw new Error('愿望不存在')
         // 2. 构造新的历史记录
+        const now = new Date();
+        // 存储本地时间字符串，避免时区困扰
+        const localTime = now.toLocaleString('zh-CN', { hour12: false });
         const newHistory = [
           ...(wish.history || []),
           {
-            time: new Date().toISOString(),
+            time: localTime,
             desc: historyDesc || '更新愿望',
             data: updates
           }
@@ -238,6 +241,7 @@ export const useWishStore = defineStore('wish', {
         // 组装新的 wish 数据
         const status: 'pending' | 'in-progress' | 'completed' =
           progress.percentage >= 100 ? 'completed' : progress.percentage > 0 ? 'in-progress' : 'pending';
+        const localTime = new Date().toLocaleString('zh-CN', { hour12: false });
         const updates: Partial<Wish> = {
           progress,
           status,
@@ -249,14 +253,14 @@ export const useWishStore = defineStore('wish', {
               milestone && !wish.rewards?.milestones?.some(m => m.description === milestone.description)
                 ? {
                     description: milestone.description,
-                    achievedAt: new Date().toISOString()
+                    achievedAt: localTime
                   }
                 : null
             ].filter(Boolean)
           },
           motivation: newMotivation,
           streakDays,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: localTime
         }
         // 通过 updateWish 追加历史
         await this.updateWish(id, updates, '进度更新')

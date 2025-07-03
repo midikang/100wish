@@ -163,10 +163,13 @@ const updateProgress = async () => {
         暂无更新历史，进行一次进度更新后即可查看。
       </div>
       <ul v-else class="history-list">
-        <li v-for="(item, idx) in wish.history" :key="idx" class="history-item">
+        <li v-for="(item, idx) in [...wish.history].slice().reverse()" :key="idx" class="history-item">
           <div class="history-time">{{ new Date(item.time).toLocaleString() }}</div>
-          <div class="history-desc">{{ item.desc }}</div>
-          <pre class="history-data">{{ typeof item.data === 'object' ? JSON.stringify(item.data, null, 2) : item.data }}</pre>
+          <!-- <div class="history-desc">{{ item.desc }}</div> -->
+          <div class="history-desc">{{ item.data.progress.current }}</div>
+          <!-- <div class="history-desc">next: {{ item.data.progress.next }}</div> -->
+
+          <!-- <pre class="history-data">{{ typeof item.data === 'object' ? JSON.stringify(item.data, null, 2) : item.data }}</pre> -->
         </li>
       </ul>
     </div>

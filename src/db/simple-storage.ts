@@ -36,8 +36,8 @@ export class SimpleStorage {
     const newWish: Wish = {
       ...wish,
       id: Date.now(), // 简单的 ID 生成
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: new Date().toLocaleString('zh-CN', { hour12: false }),
+      updatedAt: new Date().toLocaleString('zh-CN', { hour12: false })
     }
     wishes.push(newWish)
     this.saveAllWishes(wishes)
@@ -54,7 +54,7 @@ export class SimpleStorage {
     wishes[index] = {
       ...wishes[index],
       ...updates,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toLocaleString('zh-CN', { hour12: false })
     }
     
     this.saveAllWishes(wishes)
