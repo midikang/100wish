@@ -200,60 +200,47 @@ export const useWishStore = defineStore('wish', {
      */
     async updateProgress(id: number, progressUpdate: { current: string; next?: string; percentage: number }) {
       try {
-        const wish = await db.wishes.get(id)
+        const wish = this.wishes.find(w => w.id === id)
         if (!wish) throw new Error('愿望不存在')
 
-        // 确保 progressUpdate.next 始终存在
-        const progress: { current: string; next: string; percentage: number } = {
+        // 计算进度和奖励
+        const progress = {
           current: progressUpdate.current,
           next: progressUpdate.next ?? '',
           percentage: progressUpdate.percentage
         }
-
-        // 计算基础奖励点数
-        let pointsEarned = 10 // 基础点数
-        let newMotivation = wish.motivation || 50 // 默认动力值
-        
-        // 检查是否需要更新连续天数
+        let pointsEarned = 10
+        let newMotivation = wish.motivation || 50
         const now = new Date()
         const lastUpdate = wish.lastUpdated ? new Date(wish.lastUpdated) : null
-        const isConsecutive = lastUpdate && 
-          now.getDate() - lastUpdate.getDate() === 1 // 检查是否是连续的下一天
-
-        // 更新连续天数
+        const isConsecutive = lastUpdate && now.getDate() - lastUpdate.getDate() === 1
         let streakDays = wish.streakDays || 0
         if (isConsecutive) {
           streakDays++
-          pointsEarned += streakDays * 5 // 连续更新奖励
-          newMotivation += 10 // 连续更新提升动力
+          pointsEarned += streakDays * 5
+          newMotivation += 10
         } else if (lastUpdate && now.getDate() - lastUpdate.getDate() > 1) {
-          streakDays = 1 // 重置连续天数
-          newMotivation = Math.max(newMotivation - 20, 0) // 中断连续降低动力
+          streakDays = 1
+          newMotivation = Math.max(newMotivation - 20, 0)
         }
-
-        // 根据进度变化计算额外奖励
         const prevPercentage = wish.progress?.percentage || 0
         if (progressUpdate.percentage > prevPercentage) {
           const progressDiff = progressUpdate.percentage - prevPercentage
-          pointsEarned += Math.floor(progressDiff * 2) // 进度提升奖励
-          newMotivation += Math.floor(progressDiff * 0.5) // 进度提升增加动力
+          pointsEarned += Math.floor(progressDiff * 2)
+          newMotivation += Math.floor(progressDiff * 0.5)
         }
-
-        // 确保动力值在 0-100 之间
         newMotivation = Math.min(Math.max(newMotivation, 0), 100)
-
-        // 检查是否达成新的里程碑
         const milestone = this.checkMilestone(progressUpdate.percentage)
-        // 计算新徽章列表
         const prevBadges = wish.rewards?.badges || [];
         const newBadges = milestone && milestone.badge && !prevBadges.includes(milestone.badge)
           ? [...prevBadges, milestone.badge]
           : prevBadges;
-        // 更新愿望数据
-        await db.wishes.update(id, {
-          progress: progress,
-          status: progress.percentage >= 100 ? 'completed' : 
-                 progress.percentage > 0 ? 'in-progress' : 'pending',
+        // 组装新的 wish 数据
+        const status: 'pending' | 'in-progress' | 'completed' =
+          progress.percentage >= 100 ? 'completed' : progress.percentage > 0 ? 'in-progress' : 'pending';
+        const updates: Partial<Wish> = {
+          progress,
+          status,
           rewards: {
             points: (wish.rewards?.points || 0) + pointsEarned,
             badges: newBadges,
@@ -270,10 +257,9 @@ export const useWishStore = defineStore('wish', {
           motivation: newMotivation,
           streakDays,
           lastUpdated: new Date().toISOString()
-        })
-
-        // 重新加载愿望列表以更新状态
-        await this.loadWishes()
+        }
+        // 通过 updateWish 追加历史
+        await this.updateWish(id, updates, '进度更新')
       } catch (error) {
         console.error('更新进度失败:', error)
         throw error

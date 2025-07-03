@@ -28,7 +28,8 @@ const sync = async () => {
         <h1>我的100个愿望</h1>
       </router-link>      <div class="nav-actions">
         <ThemeSwitcher />
-        <div class="divider"></div>        <div class="sync-container">
+        <div class="divider"></div>        
+        <div class="sync-container">
           <span class="sync-status" :class="{ offline: !online }">
             {{ online ? syncStore.syncStatus : '离线模式' }}
           </span>

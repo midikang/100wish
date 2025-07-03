@@ -67,7 +67,7 @@ export const dbOperations = {
             ...row,
             progress: JSON.parse(row.progress || '{}'),
             rewards: JSON.parse(row.rewards || '{}'),
-            history: JSON.parse(row.history || '[]')
+            history: typeof row.history === 'string' ? JSON.parse(row.history) : []
           }));
           resolve(wishes);
         }
@@ -87,7 +87,7 @@ export const dbOperations = {
             ...row,
             progress: JSON.parse(row.progress || '{}'),
             rewards: JSON.parse(row.rewards || '{}'),
-            history: JSON.parse(row.history || '[]')
+            history: typeof row.history === 'string' ? JSON.parse(row.history) : []
           };
           resolve(wish);
         } else {

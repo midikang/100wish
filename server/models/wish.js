@@ -40,14 +40,17 @@ export function validateWishData(data) {
 
 // 格式化愿望数据
 export function formatWishData(data) {
-  return {    title: data.title?.trim(),
+  return {
+    title: data.title?.trim(),
     description: data.description?.trim() || null,
     status: data.status || 'pending',
     progress: typeof data.progress === 'string' ? JSON.parse(data.progress) : (data.progress || { current: '', next: '', percentage: 0 }),
     rewards: typeof data.rewards === 'string' ? JSON.parse(data.rewards) : (data.rewards || { points: 0, badges: [], milestones: [] }),
     motivation: data.motivation || 0,
     streakDays: data.streakDays || 0,
-    lastUpdated: data.lastUpdated || null
+    lastUpdated: data.lastUpdated || null,
+    // 透传 history 字段，确保历史记录能写入数据库
+    history: Array.isArray(data.history) ? data.history : (typeof data.history === 'string' ? JSON.parse(data.history) : []),
     // createdAt 和 updatedAt 由数据库自动处理
   };
 }
