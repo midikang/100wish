@@ -30,6 +30,7 @@ onMounted(() => {
   
   if (foundWish) {
     wish.value = foundWish
+    console.log('当前愿望history:', foundWish.history)
   } else {
     // 如果找不到愿望，返回首页
     router.push('/')
@@ -41,6 +42,7 @@ const updateProgress = async () => {
   if (!wish.value) return
   
   try {
+    console.log('开始更新进度, 当前 wish.history:', wish.value.history)
     await wishStore.updateProgress(wish.value.id, {
       current: progressForm.value.current,
       next: progressForm.value.next,
@@ -50,6 +52,7 @@ const updateProgress = async () => {
     // 重新加载愿望数据
     const updatedWish = wishStore.wishes.find(w => w.id === wish.value?.id)
     if (updatedWish) {
+      console.log('更新后 wish.history:', updatedWish.history)
       wish.value = updatedWish
     }
     
@@ -154,13 +157,16 @@ const updateProgress = async () => {
     </div>
 
     <!-- 新增：历史记录展示 -->
-    <div v-if="wish.history && wish.history.length" class="history-section">
-      <h3>更新历史</h3>
-      <ul class="history-list">
+    <div class="history-section">
+      <h3>更新历史 ({{ wish.history?.length || 0 }} 条记录)</h3>
+      <div v-if="!wish.history || wish.history.length === 0" class="no-history">
+        暂无更新历史，进行一次进度更新后即可查看。
+      </div>
+      <ul v-else class="history-list">
         <li v-for="(item, idx) in wish.history" :key="idx" class="history-item">
           <div class="history-time">{{ new Date(item.time).toLocaleString() }}</div>
           <div class="history-desc">{{ item.desc }}</div>
-          <pre class="history-data">{{ item.data }}</pre>
+          <pre class="history-data">{{ typeof item.data === 'object' ? JSON.stringify(item.data, null, 2) : item.data }}</pre>
         </li>
       </ul>
     </div>
@@ -339,6 +345,12 @@ const updateProgress = async () => {
   color: #444;
   white-space: pre-wrap;
   margin: 0.2rem 0 0 0;
+}
+.no-history {
+  text-align: center;
+  color: #888;
+  padding: 1rem 0;
+  font-style: italic;
 }
 
 @media (max-width: 768px) {
