@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import WishDetailView from '../views/WishDetailView.vue'
 import NewWishView from '../views/NewWishView.vue'
+import LoginView from '../views/LoginView.vue'
 
 /**
  * 路由配置数组
@@ -31,6 +32,14 @@ const routes = [
     meta: { 
       title: '新建愿望'
     }
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: LoginView,
+    meta: {
+      title: '登录'
+    }
   }
 ]
 
@@ -51,6 +60,24 @@ const router = createRouter({
 router.beforeEach((to, _, next) => {
   document.title = `${to.meta.title} - 我的100个愿望计划`
   next()
+})
+
+// 路由守卫：未登录跳转到 /login
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token')
+  if (to.path !== '/login' && !token) {
+    next('/login')
+  } else {
+    next()
+  }
+})
+
+// axios 请求自动带 token
+import axios from 'axios'
+axios.interceptors.request.use(config => {
+  const token = localStorage.getItem('token')
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
 })
 
 export default router

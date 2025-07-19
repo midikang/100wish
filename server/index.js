@@ -10,6 +10,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import fs from 'fs';
 import path from 'path';
+import authRouter from './routes/auth.js';
 
 dotenv.config();
 
@@ -96,6 +97,7 @@ app.get('/api/check-sync', (req, res) => {
 
 // 路由
 app.use('/api/wishes', wishRoutes);
+app.use('/api', authRouter);
 
 // 错误处理中间件
 app.use((err, req, res, next) => {
